@@ -4,10 +4,12 @@ import { Table } from "./Table";
 import { Modal } from "./Modal";
 import { initJuno } from "@junobuild/core";
 import { Auth } from "./Auth";
+import useGeolocation from './useGeolocation';
 
 function App() {
   // New state to manage the current view, possible values: 'default', 'write', 'read
   const [currentView, setCurrentView] = useState("default"); 
+  const { location, error } = useGeolocation();
 
   // TODO: STEP_1_INITIALIZATION
   // initialize the juni app with the satelliteId
@@ -35,12 +37,15 @@ function App() {
   return (
     <>
 
-      <div className="navigation-bar">
-        {/* Clickable logo and text in flex container */}
-        <button onClick={handleLogoClick} className="logo-button flex items-center">
-          <img src="/custom_logo.png" alt="Logo" className="logo w-1/6 h-auto" /> {/* Logo image */}
-          <span className="text-3xl font-bold flex-grow">World L2</span>
-        </button>
+      <div className="bg-indigo-600 text-white py-4">
+        <div className="container mx-auto flex justify-center">
+          <button
+            onClick={handleLogoClick}
+            className="text-xl font-semibold hover:text-gray-300"
+          >
+            World L2
+          </button>
+        </div>
       </div>
 
       {/* The main content of the app */}
@@ -85,11 +90,11 @@ function App() {
       )}
 
       {/* Display geo-location data when Read is clicked */}
-      {currentView === "read" && 
-        <p>
-          Show geo-location data<
-        /p>
-      }
+      {currentView === "read" && (
+        <Auth>
+          <Table userLocation={location} />
+        </Auth>
+      )}
     </>
   );
 }

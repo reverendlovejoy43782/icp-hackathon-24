@@ -1,6 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { setDoc, uploadFile } from "@junobuild/core";
+import { setDoc, uploadFile, getDoc } from "@junobuild/core";
 import { AuthContext } from "./Auth";
+import useGeolocation from './useGeolocation';
+import { findNearestSquare } from './geoGridMatch';
+import { gridPoints } from './gridGenerator';
 import { nanoid } from "nanoid";
 
 export const Modal = () => {
@@ -10,11 +13,22 @@ export const Modal = () => {
   const [progress, setProgress] = useState(false);
   const [file, setFile] = useState();
 
+  const { location, error } = useGeolocation();
+
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
+    if (location.latitude != null && location.longitude != null) {
+      const nearestSquareIndex = findNearestSquare(location.latitude, location.longitude);
+      console.log(`Nearest Square: ${nearestSquareIndex}, Grid Point: ${gridPoints[nearestSquareIndex]}`);
+    }
+  }, [location]);
+
+  // useEffect for setting 'valid'
+  useEffect(() => {
     setValid(inputText !== "" && user !== undefined && user !== null);
   }, [showModal, inputText, user]);
+
 
   const reload = () => {
     let event = new Event("reload");
@@ -22,6 +36,7 @@ export const Modal = () => {
   };
 
   const add = async () => {
+    console.log("add function called");
     // Demo purpose therefore edge case not properly handled
     if ([null, undefined].includes(user)) {
       return;
@@ -46,60 +61,51 @@ export const Modal = () => {
         url = downloadUrl;
       }
 
-      const key = nanoid();
+      // start new code entry key
+      if (location.latitude != null && location.longitude != null) {
+        const geoKey = `${location.latitude},${location.longitude}`;
+      
+        // Retrieve the existing document
+        const existingDoc = await getDoc({
+          collection: "location_info",
+          key: geoKey,
+        });
+      
+        let docData = {
+          text: existingDoc ? [...existingDoc.data.text, inputText] : [inputText],
+          updated_at: existingDoc ? existingDoc.updated_at.toString() : new Date().getTime().toString(), // Convert BigInt to String
+        };
+      
+        
+        if (existingDoc) {
+          // If document exists, append the text and use the existing updated_at
+          docData.text = [...existingDoc.data.text, inputText];
+          docData.updated_at = existingDoc.updated_at;
+        }
+        
 
-      //TODO: STEP_5_SET_DOC
-      await setDoc({
-        collection: "location_info",
-        doc: {
-          key,
-          data: {
-            text: inputText,
-            latitude, 
-            longitude, 
+        
+        // Update or create the document
+        await setDoc({
+          collection: "location_info",
+          doc: {
+            key: geoKey,
+            data: docData,
           },
-        },
-      });
-
-      // TODO: STEP_8_ADD_REFERENCE
-      // ...(url !== undefined && { url }),
+        });
+      
 
       setShowModal(false);
 
       reload();
+    }
     } catch (err) {
-      console.error(err);
-    }
-
-    setProgress(false);
-  };
-
-
-  const fetchGeolocation = () => {
-    console.log("Attempting to fetch geolocation...");
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log("Geolocation fetched:", position.coords);
-          setLatitude(position.coords.latitude);
-          setLongitude(position.coords.longitude);
-        },
-        (error) => {
-          console.error("Error fetching geolocation:", error);
-        }
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
+      console.error("Error in add function:", err);
+    } finally {
+      // This block will run whether or not an error occurred in the try block
+      setProgress(false);
     }
   };
-  
-  // Call this function when the modal is opened
-  useEffect(() => {
-    fetchGeolocation();
-  }, [showModal]);
-
-const [latitude, setLatitude] = useState(null);
-const [longitude, setLongitude] = useState(null);
 
 
   return (

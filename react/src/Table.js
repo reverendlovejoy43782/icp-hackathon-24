@@ -16,9 +16,9 @@ export const Table = () => {
 
   const list = async () => {
     // TODO: STEP_6_LIST_DOCS
-      const { items } = await listDocs({
-        collection: "location_info",
-      });
+    const { items } = await listDocs({
+      collection: "location_info",
+    });
 
     setItems(items);
   };
@@ -39,43 +39,22 @@ export const Table = () => {
       </header>
       <div className="p-3">
         <div className="overflow-x-auto">
-          {items.map((item, index) => {
+          {items.map((item) => {
             const {
               key,
-              data: { text, url },
+              data: { text },
             } = item;
+
+            // Split the key to get latitude and longitude
+            const [latitude, longitude] = key.split(',');
 
             return (
               <div key={key} className="flex items-center gap-6 px-2.5 py-1.5">
-                <span className="px-4 py-2 rounded-full text-gray-500 bg-gray-200 font-semibold text-sm flex align-center w-max">
-                  {index + 1}
-                </span>
-                <div className="line-clamp-3 text-left grow">{text}</div>
-                <div className="flex gap-2 justify-center align-middle">
-                  {url !== undefined ? (
-                    <a
-                      aria-label="Open data"
-                      rel="noopener noreferrer"
-                      href={url}
-                      target="_blank"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                        />
-                      </svg>
-                    </a>
-                  ) : undefined}
+                <div className="flex flex-col">
+                  <span className="text-gray-600 font-semibold">Latitude: {latitude}</span>
+                  <span className="text-gray-600 font-semibold">Longitude: {longitude}</span>
                 </div>
+                <div className="line-clamp-3 text-left grow">{text}</div>
               </div>
             );
           })}
