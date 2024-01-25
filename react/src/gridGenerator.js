@@ -1,48 +1,52 @@
-// Function to calculate the boundaries of the area based on central coordinates and distance
-function calculateBoundaries(lat, lon, distance) {
-    const metersInDegreeLat = 111320; // Conversion factor from meters to degrees for latitude
-    const radiansLat = (lat * Math.PI) / 180;
-    const metersInDegreeLon = metersInDegreeLat * Math.cos(radiansLat); // Conversion for longitude
+// Imports from geohash: Geohash is a public domain geocode system invented in 2008 by Gustavo Niemeyer and (similar work in 1966) G. Schimpf. It is a hierarchical spatial data structure which subdivides space into buckets of grid shape, which is one of the many applications of what is known as a Z-order curve, and generally space-filling curves.
+// ngGeohash is a geohash library for AngularJS. It provides a service and a filter.
+import geohash from 'ngeohash';
 
-    const deltaLat = distance / metersInDegreeLat;
-    const deltaLon = distance / metersInDegreeLon;
 
-    return [lat - deltaLat, lon - deltaLon, lat + deltaLat, lon + deltaLon];
-}
-
-// Function to create a grid within given latitude and longitude boundaries
-function createGrid(latStart, lonStart, latEnd, lonEnd, stepMeters) {
-    const metersInDegreeLat = 111320; // Conversion factor for latitude
+function createGridWithGeohash(latStart, lonStart, latEnd, lonEnd, stepMeters) {
+    // Conversion factor from meters to degrees latitude
+    const metersInDegreeLat = 111320; 
+    // Convert latitude start point from degrees to radians
     const radiansLat = (latStart * Math.PI) / 180;
-    const metersInDegreeLon = metersInDegreeLat * Math.cos(radiansLat); // Conversion for longitude
+    // Conversion factor from meters to degrees longitude, adjusted for latitude
+    const metersInDegreeLon = metersInDegreeLat * Math.cos(radiansLat);
 
+    // Calculate step size in degrees for latitude and longitude
     const stepDegreesLat = stepMeters / metersInDegreeLat;
     const stepDegreesLon = stepMeters / metersInDegreeLon;
 
+    // Arrays to store calculated latitudes and longitudes
     let latitudes = [];
+    let longitudes = [];
+    // Array to store grid points with geohash
+    let gridPointsWithGeohash = [];
+
+    // Populate latitudes array within the specified range
     for (let lat = latStart; lat < latEnd; lat += stepDegreesLat) {
         latitudes.push(lat);
     }
-
-    let longitudes = [];
+    // Populate longitudes array within the specified range
     for (let lon = lonStart; lon < lonEnd; lon += stepDegreesLon) {
         longitudes.push(lon);
     }
 
-    let gridPoints = [];
+    // Combine latitudes and longitudes to create grid points and calculate geohash
     latitudes.forEach(lat => {
         longitudes.forEach(lon => {
-            gridPoints.push({ lat, lon });
+            // Calculate the center point of each grid square
+            const centerLat = lat + stepDegreesLat / 2;
+            const centerLon = lon + stepDegreesLon / 2;
+            // Generate geohash for the center point
+            const geohashKey = geohash.encode(centerLat, centerLon);
+            // Add the grid point with its geohash to the array
+            gridPointsWithGeohash.push({ lat, lon, geohash: geohashKey });
         });
     });
 
-    return gridPoints;
+    // Return the array of grid points with their corresponding geohashes
+    return gridPointsWithGeohash;
 }
 
-// Example usage
-const centralLat = 52.392926;
-const centralLon = 13.092025;
-const [latStart, lonStart, latEnd, lonEnd] = calculateBoundaries(centralLat, centralLon, 2000);
-const gridPoints = createGrid(latStart, lonStart, latEnd, lonEnd, 500);
+// Export the function for use in other modules
+export { createGridWithGeohash };
 
-export { calculateBoundaries, createGrid, gridPoints };

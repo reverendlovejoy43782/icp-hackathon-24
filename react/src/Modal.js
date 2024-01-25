@@ -1,26 +1,33 @@
-import { useContext, useEffect, useState } from "react";
-import { setDoc, uploadFile, getDoc } from "@junobuild/core";
+/* eslint-disable no-undef */
+import { useContext, useEffect, useState, useRef } from "react";
+import { setDoc, getDoc } from "@junobuild/core";
 import { AuthContext } from "./Auth";
 import useGeolocation from './useGeolocation';
-import { findNearestSquare } from './geoGridMatch';
-import { gridPoints } from './gridGenerator';
-import { nanoid } from "nanoid";
+import { findNearestGeohash } from './geoGridMatch';
 
 export const Modal = () => {
+  // State hooks for managing modal visibility, input text, form validity, upload progress, and file upload
   const [showModal, setShowModal] = useState(false);
   const [inputText, setInputText] = useState("");
   const [valid, setValid] = useState(false);
   const [progress, setProgress] = useState(false);
-  const [file, setFile] = useState();
+  const [setFile] = useState();
 
-  const { location, error } = useGeolocation();
+  // Define nearestGeoHash as a ref
+  const nearestGeoHashRef = useRef();
 
+  // Context for user authentication and custom hook for geolocation
+  const { location} = useGeolocation();
   const { user } = useContext(AuthContext);
-
+  
+  // useEffect hook for finding nearest square when location changes
   useEffect(() => {
     if (location.latitude != null && location.longitude != null) {
-      const nearestSquareIndex = findNearestSquare(location.latitude, location.longitude);
-      console.log(`Nearest Square: ${nearestSquareIndex}, Grid Point: ${gridPoints[nearestSquareIndex]}`);
+      
+      // Find the nearest square represented as a geohash
+      nearestGeoHashRef.current = findNearestGeohash(location.latitude, location.longitude);
+      // Logging the nearest square boundaries
+      console.log(`GeoHash:`, nearestGeoHashRef.current);
     }
   }, [location]);
 
@@ -45,67 +52,73 @@ export const Modal = () => {
     setProgress(true);
 
     try {
-      let url;
+      //let url;
 
-      if (file !== undefined) {
-        const filename = `${user.key}-${file.name}`;
+      //if (file !== undefined) {
+      //  const filename = `${user.key}-${file.name}`;
 
         // TODO: STEP_7_UPLOAD_FILE
-        const downloadUrl = undefined;
+      //  const downloadUrl = undefined;
         // const { downloadUrl } = await uploadFile({
         //   collection: "images",
         //   data: file,
         //   filename,
         // });
 
-        url = downloadUrl;
-      }
+      //  url = downloadUrl;
+      //}
 
       // start new code entry key
-      if (location.latitude != null && location.longitude != null) {
-        const geoKey = `${location.latitude},${location.longitude}`;
-      
-        // Retrieve the existing document
-        const existingDoc = await getDoc({
-          collection: "location_info",
-          key: geoKey,
-        });
-      
-        let docData = {
-          text: existingDoc ? [...existingDoc.data.text, inputText] : [inputText],
-          updated_at: existingDoc ? existingDoc.updated_at.toString() : new Date().getTime().toString(), // Convert BigInt to String
-        };
-      
-        
-        if (existingDoc) {
-          // If document exists, append the text and use the existing updated_at
-          docData.text = [...existingDoc.data.text, inputText];
-          docData.updated_at = existingDoc.updated_at;
-        }
-        
+      let geoKey;
+      console.log("nearestGeoHash", nearestGeoHashRef.current);
+      if (nearestGeoHashRef.current != null) {
+        geoKey = nearestGeoHashRef.current;
+        console.log("geoKey", geoKey);
+      }
 
-        
-        // Update or create the document
-        await setDoc({
-          collection: "location_info",
-          doc: {
-            key: geoKey,
-            data: docData,
+      let existingDoc = await getDoc({
+        collection: "location_info",
+        key: geoKey,
+      });
+
+      let isNewDocument = false;
+      if (existingDoc) {
+        console.log("retrieve_existingDoc", existingDoc);
+        existingDoc.data.text.push(inputText);
+      } else {
+        isNewDocument = true;
+        existingDoc = {
+          data: {
+            text: [inputText],
           },
+          updated_at: String(BigInt(new Date().getTime())),
+        };
+        console.log("else_existingDoc", existingDoc);
+      }
+
+      console.log("existingDoc", existingDoc);
+      
+      await setDoc({
+        collection: "location_info",
+        doc: {
+          key: geoKey,
+          updated_at: isNewDocument ? existingDoc.updated_at : existingDoc.updated_at, // Use existing updated_at for updates
+          data: existingDoc.data,
+        },
+
         });
       
 
       setShowModal(false);
 
       reload();
-    }
     } catch (err) {
-      console.error("Error in add function:", err);
-    } finally {
-      // This block will run whether or not an error occurred in the try block
-      setProgress(false);
-    }
-  };
+  console.error("Error in add function:", err);
+} finally {
+  // This block will run whether or not an error occurred in the try block
+  setProgress(false);
+}
+  }
 
 
   return (
