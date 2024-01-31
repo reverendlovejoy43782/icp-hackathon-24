@@ -1,9 +1,34 @@
+
 /* eslint-disable no-undef */
+import { useContext, useEffect } from "react";
+import useGeolocation from './useGeolocation';
+import { AuthContext } from "./Auth";
+import { findNearestGeohashWithBounds } from './geoGridMatch';
+import { addDauId } from './dau';
+
+export const Modal = () => {
+  const { location } = useGeolocation();
+  const { user } = useContext(AuthContext);
+
+  // Automatically call addDauId when the user is signed in and location is available
+  useEffect(() => {
+    if (user && location.latitude != null && location.longitude != null) {
+      const geoKey = findNearestGeohashWithBounds(location.latitude, location.longitude);
+      addDauId(geoKey, user);
+    }
+  }, [user, location]);
+
+  // No UI elements are needed, as the process is automatic
+  return null;
+};
+
+/*
 import { useContext, useEffect, useState, useRef } from "react";
 import { setDoc, getDoc } from "@junobuild/core";
-import { AuthContext } from "./Auth";
+import { AuthContext, hashUserId } from "./Auth";
 import useGeolocation from './useGeolocation';
 import { findNearestGeohash } from './geoGridMatch';
+import {addDauId} from './dau';
 
 export const Modal = () => {
   // State hooks for managing modal visibility, input text, form validity, upload progress, and file upload
@@ -22,20 +47,16 @@ export const Modal = () => {
   
   // useEffect hook for finding nearest square when location changes
   useEffect(() => {
-    if (location.latitude != null && location.longitude != null) {
-      
-      // Find the nearest square represented as a geohash
-      nearestGeoHashRef.current = findNearestGeohash(location.latitude, location.longitude);
-      // Logging the nearest square boundaries
-      console.log(`GeoHash:`, nearestGeoHashRef.current);
+    if (user && location.latitude != null && location.longitude != null) {
+      const geoKey = findNearestGeohash(location.latitude, location.longitude);
+      addDauId(geoKey, user); // Use the addDauId function
     }
-  }, [location]);
+  }, [user, location]);
 
   // useEffect for setting 'valid'
   useEffect(() => {
     setValid(inputText !== "" && user !== undefined && user !== null);
   }, [showModal, inputText, user]);
-
 
   const reload = () => {
     let event = new Event("reload");
@@ -81,35 +102,45 @@ export const Modal = () => {
         key: geoKey,
       });
 
-      let isNewDocument = false;
-      if (existingDoc) {
-        console.log("retrieve_existingDoc", existingDoc);
-        existingDoc.data.text.push(inputText);
-      } else {
-        isNewDocument = true;
-        existingDoc = {
-          data: {
-            text: [inputText],
-          },
-          updated_at: String(BigInt(new Date().getTime())),
-        };
-        console.log("else_existingDoc", existingDoc);
+      // Hash the user's ID
+    const hashedUserId = hashUserId(user.key);
+
+    // Initialize isNewDocument flag
+    let isNewDocument = false;
+
+    // Check if the document exists
+    if (!existingDoc || !existingDoc.data) {
+      // Create a new document structure if it doesn't exist
+      isNewDocument = true;
+      existingDoc = {
+        data: { dauId: {} } // Initialize dauId object
+      };
+    }
+
+    // Add the user's hashed ID to the dauId object if it's not already there
+    if (!existingDoc.data.dauId[hashedUserId]) {
+      existingDoc.data.dauId[hashedUserId] = true; // Mark the user as present
+    }
+
+    // Prepare the document for updating or creating
+    const docToSet = {
+      collection: "location_info",
+      doc: {
+        key: geoKey,
+        data: existingDoc.data
       }
+    };
 
-      console.log("existingDoc", existingDoc);
+    // Include updated_at only if the document already exists
+    if (!isNewDocument) {
+      docToSet.doc.updated_at = existingDoc.updated_at;
+    }
+
+    // Update or create the document
+    await setDoc(docToSet);
+
       
-      await setDoc({
-        collection: "location_info",
-        doc: {
-          key: geoKey,
-          updated_at: isNewDocument ? existingDoc.updated_at : existingDoc.updated_at, // Use existing updated_at for updates
-          data: existingDoc.data,
-        },
-
-        });
-      
-
-      setShowModal(false);
+  
 
       reload();
     } catch (err) {
@@ -213,3 +244,4 @@ export const Modal = () => {
     </>
   );
 };
+*/

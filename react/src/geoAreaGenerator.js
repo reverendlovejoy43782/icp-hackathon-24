@@ -1,6 +1,6 @@
 function calculateArea(lat, lon) {
     // Set grid spacing to 1 degree for both latitude and longitude
-    const gridSpacing = 1; // This represents a grid square of roughly 111 km x 111 km at the Equator
+    const gridSpacing = 0.03; // This represents a grid square of roughly 111 km x 111 km at the Equator
 
     // Calculate the nearest lower latitude line based on the grid spacing
     const lowerLat = Math.floor(lat / gridSpacing) * gridSpacing;
