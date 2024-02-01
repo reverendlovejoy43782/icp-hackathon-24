@@ -8,6 +8,7 @@ import { Auth } from "./Auth";
 import useGeolocation from './useGeolocation';
 import GeolocationMap from "./showGeolocation";
 import { findNearestGeohashWithBounds } from './gridMatch';
+import fetchAirQualityData from './openaq';
 
 
 function App() {
@@ -21,6 +22,9 @@ function App() {
 
   // State to track if the location has been fetched
   const [isLocationFetched, setIsLocationFetched] = useState(false);
+
+  // State to track if data has been fetched and displayed once
+  const [dataDisplayed, setDataDisplayed] = useState(false);
 
   // State to track if the map is visible
   const [showMap, setShowMap] = useState(false); // New state for map visibility
@@ -66,6 +70,13 @@ function App() {
         console.log("Bounds: ", geoData.bounds);
         console.log("Geohash: ", geoData.geohash);
 
+        // Fetch air quality data for the new location
+        fetchAirQualityData(newLocation.latitude, newLocation.longitude)
+          .then(airQualityData => {
+            console.log('Air quality data:', airQualityData);
+            // Handle the air quality data as needed
+          });
+
         setShowMap(true);
       })
       .catch(error => {
@@ -87,9 +98,10 @@ function App() {
   const handleToggleMap = () => {
     if (!isLocationFetched) {
       handleFetchLocation();
-      setShowTable(true); // Show table when fetching location
+      setShowTable(true);
+      setDataDisplayed(true); // Set to true when fetching location
     } else {
-      setShowMap(!showMap); // Toggle only the map visibility
+      setShowMap(!showMap);
     }
   };
 
@@ -129,7 +141,7 @@ function App() {
           {/* Toggle Button for Map and Table */}
           <div className="text-center mt-10">
             <button onClick={handleToggleMap} className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              {showMap ? "Close Map" : "Show Geo Data"}
+              {showMap ? "Close Map" : (dataDisplayed ? "Open Map" : "Read Geo Data")}
             </button>
           </div>
 
@@ -153,7 +165,7 @@ function App() {
             <div className="text-center mt-10">
               {/* Button to change view to 'write', allowing entry creation */}
               <button onClick={handleWriteClick} className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                Write
+                Write Geo Data
               </button>
             </div>
           )}
