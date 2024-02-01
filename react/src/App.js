@@ -7,7 +7,7 @@ import { initJuno } from "@junobuild/core";
 import { Auth } from "./Auth";
 import useGeolocation from './useGeolocation';
 import GeolocationMap from "./showGeolocation";
-import { findNearestGeohashWithBounds } from './geoGridMatch';
+import { findNearestGeohashWithBounds } from './gridMatch';
 
 
 function App() {
