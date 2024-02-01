@@ -1,8 +1,8 @@
 // Import of hooks and components
 import React, { useState, useEffect } from "react";
 import { Background } from "./Background";
-import { Table } from "./Table";
-import { Modal } from "./Modal";
+import { Table } from "./readDatastore";
+import { Modal } from "./writeDatastore";
 import { initJuno } from "@junobuild/core";
 import { Auth } from "./Auth";
 import useGeolocation from './useGeolocation';
