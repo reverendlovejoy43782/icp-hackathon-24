@@ -1,22 +1,18 @@
 
 /* eslint-disable no-undef */
 import { useContext, useEffect } from "react";
-import useGeolocation from './useGeolocation';
 import { AuthContext } from "./Auth";
-import { findNearestGeohashWithBounds } from './geoGridMatch';
 import { addDauId } from './dau';
 
-export const Modal = () => {
-  const { location } = useGeolocation();
+export const Modal = ({ geohash }) => {
   const { user } = useContext(AuthContext);
 
   // Automatically call addDauId when the user is signed in and location is available
   useEffect(() => {
-    if (user && location.latitude != null && location.longitude != null) {
-      const geoKey = findNearestGeohashWithBounds(location.latitude, location.longitude);
-      addDauId(geoKey, user);
+    if (user && geohash) {
+      addDauId(geohash, user);
     }
-  }, [user, location]);
+  }, [user, geohash]);
 
   // No UI elements are needed, as the process is automatic
   return null;

@@ -25,8 +25,14 @@ function App() {
   // State to track if the map is visible
   const [showMap, setShowMap] = useState(false); // New state for map visibility
 
-// Bound state for map
-const [bounds, setBounds] = useState(null);
+  // Bound state for map
+  const [bounds, setBounds] = useState(null);
+
+  // Geohash state for map and storage
+  const [geohash, setGeohash] = useState("");
+
+  // State to track if the table is visible
+  const [showTable, setShowTable] = useState(false);
 
 
   // Effect hook to initialize Juno on component mount
@@ -50,7 +56,15 @@ const [bounds, setBounds] = useState(null);
         console.log("Location fetched in app.js handleFetchLocation " + newLocation.latitude + " " + newLocation.longitude);
         setIsLocationFetched(true); // Set to true only if location fetch is successful
         const geoData = findNearestGeohashWithBounds(newLocation.latitude, newLocation.longitude)
+
+        // Set the bounds of the square (gehohash, on map)
         setBounds(geoData.bounds);
+
+        // Set the geohash for the square
+        setGeohash(geoData.geohash); // Store the geohash
+
+        console.log("Bounds: ", geoData.bounds);
+        console.log("Geohash: ", geoData.geohash);
 
         setShowMap(true);
       })
@@ -60,15 +74,22 @@ const [bounds, setBounds] = useState(null);
       });
   };
 
-  // Function to change the current view to 'write'
-  const handleWriteClick = () => setCurrentView("write");
+  // Click handler for the Write button
+  const handleWriteClick = () => {
+    if (!isLocationFetched) {
+      handleFetchLocation();
+      setShowTable(true); // Show table when fetching location
+    }
+    setCurrentView("write");
+  };
 
-  // Function to toggle the visibility of the map
+  // Click handler for the Toggle Map button
   const handleToggleMap = () => {
     if (!isLocationFetched) {
-      handleFetchLocation(); // Fetch location if not already fetched
+      handleFetchLocation();
+      setShowTable(true); // Show table when fetching location
     } else {
-      setShowMap(!showMap); // Toggle map visibility if location is already fetched
+      setShowMap(!showMap); // Toggle only the map visibility
     }
   };
 
@@ -105,23 +126,29 @@ const [bounds, setBounds] = useState(null);
           </div>
           <Background />
 
-          {/* Component to display geolocation data in a table */}
-          <Table userLocation={location} />
-
-          {/* Toggle Button for Map */}
+          {/* Toggle Button for Map and Table */}
           <div className="text-center mt-10">
             <button onClick={handleToggleMap} className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              {showMap ? "Close Map" : "Open Map"}
+              {showMap ? "Close Map" : "Show Geo Data"}
             </button>
           </div>
 
-          {/* Add a div with vertical margin for spacing */}
-          {showMap && <div className="my-4"></div>} {/* Adjust "my-4" to increase/decrease space */}
 
-          {/* Render GeolocationMap only if showMap is true */}
-          {showMap && isLocationAvailable && <GeolocationMap location={location} bounds={bounds} />}
-
-          {/* Conditional rendering of Write button and Modal based on the current view */}
+          {/* Display loading message or the Table */}
+          {showTable && !isLocationFetched && (
+            <div className="text-center mt-10">
+              <p>... fetching data</p>
+            </div>
+          )}
+          {/* Conditionally render the Table and Map */}
+          {isLocationFetched && showTable && <Table geohash={geohash} />}
+          {showMap && isLocationAvailable && (
+            <div style={{ paddingTop: '20px' }}>  
+              <GeolocationMap location={location} bounds={bounds} />
+            </div>
+          )}
+          
+          {/* Conditional rendering of Write button and Modal */}
           {currentView === "default" && (
             <div className="text-center mt-10">
               {/* Button to change view to 'write', allowing entry creation */}
@@ -131,10 +158,10 @@ const [bounds, setBounds] = useState(null);
             </div>
           )}
 
-          {/* Rendering the Modal component within Auth for authentication when in 'write' view */}
+          {/* Render the Modal component within Auth for authentication when in 'write' view */}
           {currentView === "write" && (
             <Auth>
-              <Modal />
+              <Modal geohash={geohash} />
             </Auth>
           )}
 

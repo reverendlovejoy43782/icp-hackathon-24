@@ -9,7 +9,7 @@ import { calculateArea } from './geoAreaGenerator';
 
 // Function to find the nearest geohash and bounds to a given latitude and longitude
 function findNearestGeohashWithBounds(lat, lon) {
-    const stepMeters = 50; // Size of each square in the grid, in meters
+    const stepMeters = 500; // Size of each square in the grid, in meters
 
     // Determine the grid boundaries dynamically based on the client's location
     const { latStart, lonStart, latEnd, lonEnd } = calculateArea(lat, lon);

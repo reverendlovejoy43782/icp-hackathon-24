@@ -47,7 +47,7 @@ const GeolocationMap = ({ location, geoError, bounds }) => {
           // Create a new map instance inside the useEffect
           const mapInstance = new window.google.maps.Map(document.getElementById("map"), {
             center: { lat: location.latitude, lng: location.longitude },
-            zoom: 17,
+            zoom: 14,
           });
   
           // Create a marker for the user's location
@@ -61,10 +61,10 @@ const GeolocationMap = ({ location, geoError, bounds }) => {
           if (bounds) {
             new window.google.maps.Rectangle({
               strokeColor: "#FF0000",
-              strokeOpacity: 0.2,
-              strokeWeight: 2,
+              strokeOpacity: 0.1,
+              strokeWeight: 1,
               fillColor: "#FF0000",
-              fillOpacity: 0.35,
+              fillOpacity: 0.2,
               map: mapInstance,
               bounds: {
                 north: bounds.latEnd,
