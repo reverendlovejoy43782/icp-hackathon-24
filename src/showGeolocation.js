@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const GeolocationMap = ({ location, geoError, bounds }) => {
+const GeolocationMap = ({ location, geoError, bounds, geohash }) => {
 
     const [mapLoadError, setMapLoadError] = useState(null);
     const [isScriptLoaded, setIsScriptLoaded] = useState(false);
@@ -73,9 +73,30 @@ const GeolocationMap = ({ location, geoError, bounds }) => {
                 west: bounds.lonStart,
               },
             });
+
+            // Calculate the center longitude and a slightly lower latitude
+            const centerLng = (bounds.lonStart + bounds.lonEnd) / 2;
+            const offsetLat = bounds.latEnd - (bounds.latEnd - bounds.latStart) * 0.09; // Adjust 9% southward
+
+            // Create a marker with the geohash label at the adjusted position
+            new window.google.maps.Marker({
+              position: { lat: offsetLat, lng: centerLng },
+              map: mapInstance,
+              label: {
+                text: geohash,
+                color: "#FF0000",
+                // Additional label styling options can be added here
+              },
+              icon: {
+                path: window.google.maps.SymbolPath.CIRCLE,
+                fillOpacity: 0,
+                strokeOpacity: 0,
+                scale: 0 // Marker remains invisible
+              }
+            });
           }
         }
-      }, [location, bounds, isScriptLoaded]);
+      }, [location, bounds, isScriptLoaded, geohash]); // Include geohash in the dependency array
   
 
   // Display error messages if any

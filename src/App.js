@@ -156,7 +156,7 @@ function App() {
           {isLocationFetched && showTable && <Table geohash={geohash} />}
           {showMap && isLocationAvailable && (
             <div style={{ paddingTop: '20px' }}>  
-              <GeolocationMap location={location} bounds={bounds} />
+              <GeolocationMap location={location} bounds={bounds} geohash={geohash} />
             </div>
           )}
           

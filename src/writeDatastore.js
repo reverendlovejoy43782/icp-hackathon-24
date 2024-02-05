@@ -4,6 +4,8 @@ import { useContext, useEffect } from "react";
 import { AuthContext } from "./Auth";
 import { addDauId } from './dau';
 
+
+
 export const Modal = ({ geohash }) => {
   const { user } = useContext(AuthContext);
 
