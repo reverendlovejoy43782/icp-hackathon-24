@@ -23,7 +23,7 @@ const getTodayString = () => {
 */
 
 // Function to add or update the Daily Active User (DAU) count
-export const addDauId = async (geoKey, user) => {
+export const addDauId = async (geoKey, user, onWriteSuccess) => {
   // Check if the necessary parameters are provided
   if (!user || !geoKey) {
     console.error("User or GeoKey is missing.");
@@ -85,6 +85,14 @@ export const addDauId = async (geoKey, user) => {
 
     // Save the updated document to the datastore.
     await setDoc(docToSet);
+
+    // If successful, invoke the callback
+    if (onWriteSuccess) {
+      onWriteSuccess();
+      console.log('dau.js > Write operation was successful');
+    }
+
+
   } catch (err) {
     // Log any errors that occur during the process.
     console.error("Error in addDauId function:", err);

@@ -3,19 +3,30 @@ import { listDocs } from "@junobuild/core";
 import { countDauId } from './dau';
 
 // Define the Table component with 'geohash' received as a prop
-export const Table = ({ geohash }) => {
+export const Table = ({ geohash, refreshTable }) => {
   // State to store the list of items/documents fetched from the database
   const [items, setItems] = useState([]);
 
   // State to keep track of the user count derived from the data
   const [userCount, setUserCount] = useState(0);
 
+
+
+  // check if refreshTable changes properly
+
+  useEffect(() => {
+    console.log('Table - refreshTable:', refreshTable);
+  }, [refreshTable]);
+
+  // end of test
+
   // useEffect hook to perform side effects (data fetching)
   useEffect(() => {
     // Async function to fetch data
     const fetchData = async () => {
       // Check if geohash is available
-      if (geohash) {
+      if (geohash && refreshTable) {
+        console.log("Table useEffect geohash and refreshTable", geohash, refreshTable)
         try {
           const { items } = await listDocs({
             collection: "location_info",
@@ -41,7 +52,7 @@ export const Table = ({ geohash }) => {
 
     // Execute the fetchData function
     fetchData();
-  }, [geohash]); // The effect depends on the geohash prop
+  }, [geohash, refreshTable]); // The effect depends on the geohash prop
 
   // Render the component
   return (

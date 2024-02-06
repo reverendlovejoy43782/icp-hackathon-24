@@ -11,7 +11,7 @@ export const Login = () => {
       >
         <div className="flex items-center justify-center gap-1.5">
           
-          Write
+          Login
         </div>
       </button>
     </div>

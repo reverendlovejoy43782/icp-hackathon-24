@@ -8,7 +8,7 @@ import { Auth } from "./Auth";
 import useGeolocation from './useGeolocation';
 import GeolocationMap from "./showGeolocation";
 import { findNearestGeohashWithBounds } from './gridMatch';
-import fetchAirQualityData from './openaq';
+//import fetchAirQualityData from './openaq';
 
 
 function App() {
@@ -38,6 +38,19 @@ function App() {
   // State to track if the table is visible
   const [showTable, setShowTable] = useState(false);
 
+  // State to track if the table should be refreshed
+  const [refreshTable, setRefreshTable] = useState(false);
+
+
+  // Update the state when the write operation is successful
+  const onWriteSuccess = () => {
+    // Handle the successful write here
+    console.log('Write operation was successful');
+    
+    // Set refreshTable to true to trigger a refresh of the Table component
+    setRefreshTable(true);
+    console.log('refreshTable', refreshTable);
+  };
 
   // Effect hook to initialize Juno on component mount
   useEffect(() => {
@@ -71,11 +84,13 @@ function App() {
         console.log("Geohash: ", geoData.geohash);
 
         // Fetch air quality data for the new location
+        /*
         fetchAirQualityData(newLocation.latitude, newLocation.longitude)
           .then(airQualityData => {
             console.log('Air quality data:', airQualityData);
             // Handle the air quality data as needed
           });
+          */
 
         setShowMap(true);
       })
@@ -87,12 +102,17 @@ function App() {
 
   // Click handler for the Write button
   const handleWriteClick = () => {
-    if (!isLocationFetched) {
+    // Check if geohash is not set
+    if (!geohash) {
       handleFetchLocation();
-      setShowTable(true); // Show table when fetching location
     }
+    setShowTable(true);  // Ensure table is shown
+    setShowMap(true);    // Ensure map is shown
     setCurrentView("write");
+    // Set refreshTable to true to trigger a refresh of the Table component
+    setRefreshTable(true);
   };
+  
 
   // Click handler for the Toggle Map button
   const handleToggleMap = () => {
@@ -100,6 +120,7 @@ function App() {
       handleFetchLocation();
       setShowTable(true);
       setDataDisplayed(true); // Set to true when fetching location
+      setRefreshTable(true); // Trigger a refresh of the Table component
     } else {
       setShowMap(!showMap);
     }
@@ -153,7 +174,7 @@ function App() {
             </div>
           )}
           {/* Conditionally render the Table and Map */}
-          {isLocationFetched && showTable && <Table geohash={geohash} />}
+          {isLocationFetched && showTable && <Table geohash={geohash} refreshTable={refreshTable} />}
           {showMap && isLocationAvailable && (
             <div style={{ paddingTop: '20px' }}>  
               <GeolocationMap location={location} bounds={bounds} geohash={geohash} />
@@ -173,7 +194,7 @@ function App() {
           {/* Render the Modal component within Auth for authentication when in 'write' view */}
           {currentView === "write" && (
             <Auth>
-              <Modal geohash={geohash} />
+              <Modal geohash={geohash} onWriteSuccess={onWriteSuccess} />
             </Auth>
           )}
 

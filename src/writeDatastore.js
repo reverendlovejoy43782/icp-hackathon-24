@@ -6,15 +6,19 @@ import { addDauId } from './dau';
 
 
 
-export const Modal = ({ geohash }) => {
+export const Modal = ({ geohash, onWriteSuccess }) => {
+  
   const { user } = useContext(AuthContext);
+  console.log("modal start geohash and user", geohash, user)
+  
 
   // Automatically call addDauId when the user is signed in and location is available
   useEffect(() => {
     if (user && geohash) {
-      addDauId(geohash, user);
+      console.log("modal useEffect geohash and user", geohash , user);
+      addDauId(geohash, user, onWriteSuccess);
     }
-  }, [user, geohash]);
+  }, [user, geohash, onWriteSuccess]);
 
   // No UI elements are needed, as the process is automatic
   return null;
