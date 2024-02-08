@@ -2,7 +2,7 @@
 /* eslint-disable no-undef */
 import { useContext, useEffect } from "react";
 import { AuthContext } from "./Auth";
-import { addDauId } from './dau';
+import { addDauId } from './visitors';
 
 
 

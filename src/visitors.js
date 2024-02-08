@@ -57,11 +57,13 @@ export const addDauId = async (geoKey, user, onWriteSuccess) => {
     }
 
     // Remove dauId for past minutes
+    /*
     Object.keys(existingDoc.data.dau).forEach((date) => {
       if (date !== today) {
         delete existingDoc.data.dau[date].dauId;
       }
     });
+    */
 
     // If the user's hash is not in today's DAU list, add it and increment the count.
     if (!existingDoc.data.dau[today].dauId.includes(hashedUserId)) {
@@ -100,6 +102,27 @@ export const addDauId = async (geoKey, user, onWriteSuccess) => {
 };
 
 
+export const countVisitors = (dauData) => {
+  if (!dauData) {
+    // Return "no data" if there's no data provided.
+    return "no data";
+  }
+
+  // Generate the timestamp for the current minute.
+  const currentTimestamp = getTodayString();
+
+  // Check if there's a DAU value for the current timestamp in the provided data.
+  if (dauData[currentTimestamp] && dauData[currentTimestamp].dau) {
+    // If a matching entry exists, return its DAU value.
+    return dauData[currentTimestamp].dau;
+  } else {
+    // If no matching entry exists, return "no data".
+    return "no data";
+  }
+};
+
+
+/* average DAU
 export const countDauId = (dauData) => {
   if (!dauData) {
     return 0;
@@ -115,72 +138,52 @@ export const countDauId = (dauData) => {
 
   return dayCount > 0 ? totalDau / dayCount : 0; // Return the average DAU
 };
-
-
-/* legacy code 240205
-import { setDoc, getDoc } from "@junobuild/core";
-import { hashUserId } from "./Auth"; // Adjust the path as necessary
-
-
-// Storing the user id hash in a comma-separated string with key dauId
-export const addDauId = async (geoKey, user) => {
-    if (!user || !geoKey) {
-      console.error("User or GeoKey is missing.");
-      return;
-    }
-  
-    try {
-      const hashedUserId = hashUserId(user.key);
-  
-      let existingDoc = await getDoc({
-        collection: "location_info",
-        key: geoKey,
-      });
-  
-      let isNewDocument = false;
-  
-      if (!existingDoc || !existingDoc.data) {
-        isNewDocument = true;
-        existingDoc = {
-          data: { dauId: "" } // Initialize dauId as an empty string
-        };
-      }
-  
-      // Check if the hashed user ID is already in dauId
-      if (!existingDoc.data.dauId.includes(hashedUserId)) {
-        // Concatenate the hashed user ID to the dauId string
-        existingDoc.data.dauId += existingDoc.data.dauId ? `,${hashedUserId}` : hashedUserId;
-  
-        const docToSet = {
-          collection: "location_info",
-          doc: {
-            key: geoKey,
-            data: existingDoc.data
-          }
-        };
-  
-        if (!isNewDocument) {
-          docToSet.doc.updated_at = existingDoc.updated_at;
-        }
-  
-        await setDoc(docToSet);
-      }
-    } catch (err) {
-      console.error("Error in addDauId function:", err);
-    }
-  };
-
-// Count the number of unique user hashes in dauId
-export const countDauId = (dauIdString) => {
-    if (!dauIdString) {
-        return 0;
-    }
-
-    // Split the string by commas to get individual user hashes
-    const userHashes = dauIdString.split(',');
-
-    // Count the number of unique user hashes
-    return userHashes.length;
-};
-  
 */
+
+export const calculatePercentageDifferenceVisitors = (dauData) => {
+  // Assuming getTodayString() gives us the current timestamp in the required format
+  const currentTimestamp = getTodayString();
+  console.log("Visitors.js Current Timestamp:", currentTimestamp);
+
+  if (!dauData || !dauData[currentTimestamp]) {
+    console.log("visitors.js No current data for the minute");
+    return "no data"; // No current data for the minute
+  }
+
+  const currentDau = dauData[currentTimestamp].dau;
+  console.log("visitors.js Current DAU:", currentDau);
+  let pastDauValues = [];
+
+  for (const [timestamp, { dau }] of Object.entries(dauData)) {
+    if (timestamp < currentTimestamp) { // Only consider past data
+      pastDauValues.push(dau);
+    }
+  }
+  console.log("visitors.js Past DAU Values:", pastDauValues); 
+
+  if (pastDauValues.length === 0) {
+    console.log("visitors.js No past data to compare against");
+    return "no data"; // No past data to compare against
+  }
+
+  const sumPastDau = pastDauValues.reduce((acc, value) => acc + value, 0);
+  const averagePastDau = sumPastDau / pastDauValues.length;
+
+  console.log("visitors.js Sum of Past DAU:", sumPastDau, "Average Past DAU:", averagePastDau);
+
+  // Avoid division by zero by ensuring averagePastDau is not zero
+  if (averagePastDau === 0) {
+    console.log("visitors.js Average past DAU is 0");
+    return "no data";
+  }
+
+  const percentageDifference = ((currentDau - averagePastDau) / averagePastDau) * 100;
+  console.log("visitors.js Percentage Difference:", percentageDifference);
+  
+  // Ensure the calculation is numeric and finite.
+  console.log("visitors.js isFinite(percentageDifference):", isFinite(percentageDifference), "Return Value:", `${percentageDifference.toFixed(2)}%`);
+  return isFinite(percentageDifference) ? `${percentageDifference.toFixed(2)}%` : "no data";
+};
+
+
+
