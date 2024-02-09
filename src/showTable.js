@@ -8,7 +8,7 @@ import { countVisitors, calculatePercentageDifferenceVisitors } from './visitors
 import { generateMockMetrics } from "./mockMetrics";
 
 // Define the Table component that takes 'geohash' and 'refreshTable' as props.
-export const Table = ({ geohash, refreshTable }) => {
+export const Table = ({ geohash, latitude, longitude, refreshTable }) => {
   const [items, setItems] = useState([]);
   const [userCount, setUserCount] = useState(0);
   const [percentageDifference, setPercentageDifference] = useState(0);
@@ -80,7 +80,7 @@ useEffect(() => {
         if (percentageDifferences.length > 0) {
           const averagePercentageDifference = percentageDifferences.reduce((acc, val) => acc + val, 0) / percentageDifferences.length;
           // This is always a number, so calling .toFixed() here is safe
-          setPercentageDifference(averagePercentageDifference.toFixed(2));
+          setPercentageDifference(averagePercentageDifference.toFixed(0));
         } else {
           // Directly set a string without attempting to call .toFixed() on it
           setPercentageDifference("No Data");
@@ -99,71 +99,84 @@ useEffect(() => {
 
 
 
-  return (
-    <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200 mt-8">
-      <div className="p-3">
-        <div className="overflow-x-auto">
-          {/* Static sections with bold titles */}
-          <div className="text-gray-800 text-lg mb-2 font-bold">Environment</div>
-            <div className="pl-4">
-              <div className="text-gray-800 text-lg mb-2">
-                Flooding Probability: {environmentMetrics.floodingProbability}
-              </div>
-              <div className="text-gray-800 text-lg mb-2">
-                Hurricane Probability: {environmentMetrics.hurricaneProbability}
-              </div>
-              <div className="text-gray-800 text-lg mb-2">
-              Pollution Index: {environmentMetrics.pollutionIndex}
-              </div>
+return (
+  <div className="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200 mt-8">
+    <div className="p-3">
+      <div className="overflow-x-auto">
 
-            </div>
-          <div className="text-gray-800 text-lg mb-2 font-bold">Traffic</div>
-            <div className="pl-4">
-              <div className="text-gray-800 text-lg mb-2">
-                Traffic Accident Probability: {trafficMetrics.trafficAccidentsProbability}
-              </div>
-            </div>
+        {/* Add Geolocation Display Here */}
+        <div className="text-gray-800 text-lg mb-4">
+          <strong>Your Location:</strong> {latitude}, {longitude}
+        </div>
 
-          <div className="text-gray-800 text-lg mb-2 font-bold">Safety</div>
-            <div className="pl-4">
-                <div className="text-gray-800 text-lg mb-2">
-                  Crime Index: {safetyMetrics.crimeIndex}
-                </div>
-              </div>
-          <div className="text-gray-800 text-lg mb-2 font-bold">Public Health</div>
-            <div className="pl-4">
-              <div className="text-gray-800 text-lg mb-2">
-                Incidence Rate Pandemic Diseases: {publicHealthMetrics.incidenceRatePandemicDiseases}
-              </div>
-            </div>
+        {/* Add Geolocation Display Here */}
+        <div className="text-gray-800 text-lg mb-4">
+          <strong>Corresponding square:</strong> {geohash}
+        </div>
 
-          {/* Society section with dynamic content */}
-          <div className="text-gray-800 text-lg mb-2 font-bold">Society</div>
-          {/* Nested content under Society */}
-          <div className="pl-4">
-            <div className="text-gray-800 text-lg mb-2">
-              Check-ins today: {userCount}
-            </div>
-            <div className="text-gray-800 text-lg mb-2">
-              Difference to yesterday: {typeof percentageDifference === 'number' ? `${percentageDifference}%` : percentageDifference}
-            </div>
+        {/* Static sections with bold titles */}
+        <div className="text-gray-800 text-lg mb-2 font-bold">Environment</div>
+        <div className="pl-4">
+          <div className="text-gray-800 text-lg mb-2">
+            Flooding Probability: {(environmentMetrics.floodingProbability * 100).toFixed(0)}%
+          </div>
+          <div className="text-gray-800 text-lg mb-2">
+            Hurricane Probability: {(environmentMetrics.hurricaneProbability * 100).toFixed(0)}%
+          </div>
+          <div className="text-gray-800 text-lg mb-2">
+            Pollution Rate: {(environmentMetrics.pollutionIndex * 100).toFixed(0)}%
+          </div>
+        </div>
+
+        <div className="text-gray-800 text-lg mb-2 font-bold">Traffic</div>
+        <div className="pl-4">
+          <div className="text-gray-800 text-lg mb-2">
+            Traffic Accident Probability: {(trafficMetrics.trafficAccidentsProbability * 100).toFixed(0)}%
+          </div>
+        </div>
+
+        <div className="text-gray-800 text-lg mb-2 font-bold">Safety</div>
+        <div className="pl-4">
+          <div className="text-gray-800 text-lg mb-2">
+            Crime Rate: {(safetyMetrics.crimeIndex * 100).toFixed(0)}%
+          </div>
+        </div>
+
+        <div className="text-gray-800 text-lg mb-2 font-bold">Public Health</div>
+        <div className="pl-4">
+          <div className="text-gray-800 text-lg mb-2">
+            Incidence Rate Pandemic Diseases: {(publicHealthMetrics.incidenceRatePandemicDiseases * 100).toFixed(0)}%
+          </div>
+        </div>
+
+        {/* Society section with dynamic content */}
+        <div className="text-gray-800 text-lg mb-2 font-bold">Society</div>
+        <div className="pl-4">
+          <div className="text-gray-800 text-lg mb-2">
+            Check-ins today: {userCount}
+          </div>
+          <div className="text-gray-800 text-lg mb-2">
+            Difference to average: {percentageDifference} %
           </div>
 
-          {/* Personal section */}
-          <div className="text-gray-800 text-lg mb-2 font-bold">Personal</div>
-          
-          {/* Example dynamic listing if needed for each section */}
-          {items.map((item) => {
-            const { key, data: { text } } = item;
-            return (
-              <div key={key} className="px-2.5 py-1.5">
-                <div className="text-gray-800 text-lg">{text}</div>
-              </div>
-            );
-          })}
         </div>
+
+        {/* Personal section */}
+        <div className="text-gray-800 text-lg mb-2 font-bold">Personal</div>
+        
+        {/* Example dynamic listing if needed for each section */}
+        {items.map((item) => {
+          const { key, data: { text } } = item;
+          return (
+            <div key={key} className="px-2.5 py-1.5">
+              <div className="text-gray-800 text-lg">{text}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
-  );
+  </div>
+);
+
 
 }

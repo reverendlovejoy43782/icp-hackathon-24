@@ -139,51 +139,66 @@ export const countDauId = (dauData) => {
   return dayCount > 0 ? totalDau / dayCount : 0; // Return the average DAU
 };
 */
+// Function to generate an array of timestamps for the last 28 minutes
+const getLast28MinuteTimestamps = () => {
+  const timestamps = []; // Initialize an array to hold the timestamps
+  const now = new Date(); // Get the current date and time
 
+  // Loop to generate timestamps for each of the last 28 minutes, including the current minute
+  for (let i = 0; i <= 28; i++) {
+    let pastMinute = new Date(now.getTime() - i * 60000); // Calculate the timestamp for each minute in the past
+    // Format the timestamp components to ensure two digits for month, day, hour, and minute
+    const year = pastMinute.getFullYear();
+    const month = pastMinute.getMonth() + 1; // Adjust month index (0-11)
+    const day = pastMinute.getDate();
+    const hour = pastMinute.getHours();
+    const minute = pastMinute.getMinutes();
+    // Construct the timestamp string in the format YYYY-MM-DD-HH-MM
+    const timestamp = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}-${hour.toString().padStart(2, '0')}-${minute.toString().padStart(2, '0')}`;
+    timestamps.unshift(timestamp); // Add the timestamp to the start of the array to maintain chronological order
+  }
+  return timestamps; // Return the array of last 28 minute timestamps
+};
+
+
+
+// Function to calculate the percentage difference in DAU for the current minute compared to the average of the last 28 minutes
 export const calculatePercentageDifferenceVisitors = (dauData) => {
-  // Assuming getTodayString() gives us the current timestamp in the required format
-  const currentTimestamp = getTodayString();
-  console.log("Visitors.js Current Timestamp:", currentTimestamp);
+  const last28MinuteTimestamps = getLast28MinuteTimestamps(); // Get the last 28 minute timestamps
 
-  if (!dauData || !dauData[currentTimestamp]) {
-    console.log("visitors.js No current data for the minute");
-    return "no data"; // No current data for the minute
-  }
+  // Map over the last 28 minute timestamps to extract DAU counts, defaulting to 0 for missing entries
+  let pastDauValues = last28MinuteTimestamps.map(timestamp => {
+    return dauData[timestamp] && dauData[timestamp].dau ? dauData[timestamp].dau : 0;
+  });
 
-  const currentDau = dauData[currentTimestamp].dau;
-  console.log("visitors.js Current DAU:", currentDau);
-  let pastDauValues = [];
+  // Remove the current minute's DAU count to focus on past data only
+  pastDauValues.pop(); // Assumes the current minute is the last element in the array
 
-  for (const [timestamp, { dau }] of Object.entries(dauData)) {
-    if (timestamp < currentTimestamp) { // Only consider past data
-      pastDauValues.push(dau);
-    }
-  }
-  console.log("visitors.js Past DAU Values:", pastDauValues); 
-
+  // Check if we have any past data to compare against
   if (pastDauValues.length === 0) {
-    console.log("visitors.js No past data to compare against");
-    return "no data"; // No past data to compare against
+    return "no data"; // Return "no data" if there are no past DAU values for comparison
   }
 
+  // Extract the current minute's DAU count, defaulting to 0 if not present
+  const currentDau = dauData[last28MinuteTimestamps[last28MinuteTimestamps.length - 1]]?.dau || 0;
+
+  // Calculate the sum of past DAU values
   const sumPastDau = pastDauValues.reduce((acc, value) => acc + value, 0);
-  const averagePastDau = sumPastDau / pastDauValues.length;
+  // Calculate the average of past DAU values, ensuring we don't divide by zero
+  const averagePastDau = sumPastDau / (pastDauValues.length || 1);
 
-  console.log("visitors.js Sum of Past DAU:", sumPastDau, "Average Past DAU:", averagePastDau);
-
-  // Avoid division by zero by ensuring averagePastDau is not zero
+  // Check if the average past DAU is 0 to avoid division by zero in the percentage calculation
   if (averagePastDau === 0) {
-    console.log("visitors.js Average past DAU is 0");
     return "no data";
   }
 
+  // Calculate the percentage difference between the current DAU and the average past DAU
   const percentageDifference = ((currentDau - averagePastDau) / averagePastDau) * 100;
-  console.log("visitors.js Percentage Difference:", percentageDifference);
-  
-  // Ensure the calculation is numeric and finite.
-  console.log("visitors.js isFinite(percentageDifference):", isFinite(percentageDifference), "Return Value:", `${percentageDifference.toFixed(2)}%`);
-  return isFinite(percentageDifference) ? `${percentageDifference.toFixed(2)}%` : "no data";
+
+  // Return the percentage difference, formatted to 2 decimal places, or "no data" if the result is not a finite number
+  return isFinite(percentageDifference) ? `${percentageDifference.toFixed(0)}%` : "no data";
 };
+
 
 
 
