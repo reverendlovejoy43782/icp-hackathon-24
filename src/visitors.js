@@ -194,11 +194,46 @@ export const calculatePercentageDifferenceVisitors = (dauData) => {
 
   // Calculate the percentage difference between the current DAU and the average past DAU
   const percentageDifference = ((currentDau - averagePastDau) / averagePastDau) * 100;
+  console.log('percentageDifference', percentageDifference);
 
   // Return the percentage difference, formatted to 2 decimal places, or "no data" if the result is not a finite number
   return isFinite(percentageDifference) ? `${percentageDifference.toFixed(0)}%` : "no data";
 };
 
 
+// Function to find timestamps where a user's hashed ID appears
+export const findUserTimestampsInDAU = async (geoKey, user) => {
+  // Hash the user's ID
+  const hashedUserId = hashUserId(user.key);
+
+  // Fetch the existing document from the datastore for the given geohash
+  try {
+    const existingDoc = await getDoc({
+      collection: "location_info",
+      key: geoKey,
+    });
+
+    if (!existingDoc || !existingDoc.data || !existingDoc.data.dau) {
+      console.error("No DAU data found.");
+      return [];
+    }
+
+    // Initialize an array to hold timestamps where the hashed user ID is found
+    const matchedTimestamps = [];
+
+    // Iterate through the DAU data to find matches
+    Object.entries(existingDoc.data.dau).forEach(([timestamp, { dauId }]) => {
+      if (dauId && dauId.includes(hashedUserId)) {
+        // If the hashed user ID is found in the dauId string, add the timestamp to the array
+        matchedTimestamps.push(timestamp);
+      }
+    });
+
+    return matchedTimestamps;
+  } catch (err) {
+    console.error("Error fetching DAU data:", err);
+    return [];
+  }
+};
 
 

@@ -1,5 +1,5 @@
 // Import of hooks and components
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Background } from "./Background";
 import { Table } from "./showTable";
 import { Modal } from "./handleWriteFunctions";
@@ -35,6 +35,7 @@ function App() {
   // Geohash state for map and storage
   const [geohash, setGeohash] = useState("");
 
+
   // State variables for latitude and longitude
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
@@ -43,18 +44,18 @@ function App() {
   const [showTable, setShowTable] = useState(false);
 
   // State to track if the table should be refreshed
-  const [refreshTable, setRefreshTable] = useState(false);
+  //const [refreshTable, setRefreshTable] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0); // Use a counter
+
 
 
   // Update the state when the write operation is successful
-  const onWriteSuccess = () => {
-    // Handle the successful write here
+  const onWriteSuccess = useCallback(() => {
     console.log('Write operation was successful');
     
-    // Set refreshTable to true to trigger a refresh of the Table component
-    setRefreshTable(true);
-    console.log('refreshTable', refreshTable);
-  };
+    // Increment the counter to trigger a refresh
+    setRefreshCounter(prevCounter => prevCounter + 1);
+}, []); 
 
   // Effect hook to initialize Juno on component mount
   useEffect(() => {
@@ -118,8 +119,8 @@ function App() {
     setShowTable(true);  // Ensure table is shown
     setShowMap(true);    // Ensure map is shown
     setCurrentView("write");
-    // Set refreshTable to true to trigger a refresh of the Table component
-    setRefreshTable(true);
+    // Increment the counter to trigger a refresh
+    setRefreshCounter(prevCounter => prevCounter + 1);
   };
   
 
@@ -129,7 +130,8 @@ function App() {
       handleFetchLocation();
       setShowTable(true);
       setDataDisplayed(true); // Set to true when fetching location
-      setRefreshTable(true); // Trigger a refresh of the Table component
+      // Increment the counter to trigger a refresh
+      //setRefreshCounter(prevCounter => prevCounter + 1);
     } else {
       setShowMap(!showMap);
     }
@@ -156,23 +158,27 @@ return (
     {/* Main content section */}
     <div className="isolate bg-white">
       <main>
-        <div className="relative px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl pt-16">
-            <div className="text-center">
-              {/* Description text */}
-              <p className="mt-6 text-lg leading-8 text-gray-600">
-                This is a prototype for a decentralized geolocation service.
-              </p>
-            </div>
-          </div>
-        </div>
         <Background />
 
-        {/* Toggle Button for Map and Table */}
-        <div className="text-center mt-10">
-          <button onClick={handleToggleMap} className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+        {/* Buttons container with flex layout */}
+        <div className="flex justify-center items-center mt-10 space-x-4">
+          {/* Toggle Button for Map and Table */}
+          <button onClick={handleToggleMap} className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500">
             {showMap ? "Close Map" : (dataDisplayed ? "Open Map" : "Show Geo Data")}
           </button>
+
+          {/* Conditional rendering of Write button */}
+          {currentView === "default" && (
+            <button onClick={handleWriteClick} className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500">
+              Check in
+            </button>
+          )}
+          {/* Render the Modal component within Auth for authentication when in 'write' view */}
+          {currentView === "write" && (
+            <Auth>
+              <Modal geohash={geohash} onWriteSuccess={onWriteSuccess} />
+            </Auth>   
+        )}
         </div>
 
         {/* Conditionally render the Map */}
@@ -183,7 +189,7 @@ return (
         )}
 
         {/* Conditionally render the Table */}
-        {isLocationFetched && showTable && <Table geohash={geohash} latitude={latitude} longitude={longitude} refreshTable={refreshTable} />}
+        {isLocationFetched && showTable && <Table geohash={geohash} latitude={latitude} longitude={longitude} refreshCounter={refreshCounter} />}
 
         {/* Display loading message or the Table */}
         {showTable && !isLocationFetched && (
@@ -193,26 +199,9 @@ return (
         )}
         
         
-        {/* Conditional rendering of Write button and Modal */}
-        {currentView === "default" && (
-          <div className="text-center mt-10">
-            {/* Button to change view to 'write', allowing entry creation */}
-            <button onClick={handleWriteClick} className="rounded-md bg-indigo-600 px-3.5 py-1.5 text-base font-semibold leading-7 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-              Check in
-            </button>
-          </div>
-        )}
-
-        {/* Render the Modal component within Auth for authentication when in 'write' view */}
-        {currentView === "write" && (
-          <Auth>
-            <Modal geohash={geohash} onWriteSuccess={onWriteSuccess} />
-          </Auth>
-        )}
 
         {/* Display geolocation error if it exists */}
         {geoError && <div className="error-message">Error: {geoError}</div>}
-
       </main>
     </div>
   </>

@@ -1,14 +1,22 @@
 // Import necessary hooks and functions from React and the data access library.
-import { useEffect, useState } from "react";
-import { listDocs } from "@junobuild/core";
+import { useEffect, useState, useContext } from "react";
+import { listDocs} from "@junobuild/core";
+
+// Import the AuthContext to access the user object.
+import { AuthContext } from './Auth';
+
 // Import functions for DAU calculation and percentage difference.
 import { countVisitors, calculatePercentageDifferenceVisitors } from './visitors';
 
 // Import the mock data generator for testing purposes.
 import { generateMockMetrics } from "./mockMetrics";
 
+// Import the function to retrieve a list of timestamps where user was at a location
+// import { findUserTimestampsInDAU } from './visitors';
+
+
 // Define the Table component that takes 'geohash' and 'refreshTable' as props.
-export const Table = ({ geohash, latitude, longitude, refreshTable }) => {
+export const Table = ({ geohash, latitude, longitude, refreshCounter }) => {
   const [items, setItems] = useState([]);
   const [userCount, setUserCount] = useState(0);
   const [percentageDifference, setPercentageDifference] = useState(0);
@@ -16,15 +24,21 @@ export const Table = ({ geohash, latitude, longitude, refreshTable }) => {
   const [trafficMetrics, setTrafficMetrics] = useState({});
   const [safetyMetrics, setSafetyMetrics] = useState({});
   const [publicHealthMetrics, setPublicHealthMetrics] = useState({});
+  //const [userTimestamps, setUserTimestamps] = useState([]);
+
+
+  // Access user from AuthContext
+  // const { user } = useContext(AuthContext);
+
 
   useEffect(() => {
-    console.log('Table - refreshTable:', refreshTable);
-  }, [refreshTable]);
+    console.log('showTable.js > useEffect > refreshCounter:', refreshCounter);
+  }, [refreshCounter]);
 
   // Inside your Table component
 useEffect(() => {
   const fetchData = async () => {
-    if (geohash && refreshTable) {
+    if (geohash && refreshCounter) {
       try {
         const { items } = await listDocs({
           collection: "location_info",
@@ -77,14 +91,19 @@ useEffect(() => {
         }
 
         // Calculate the average percentage difference if any valid percentages were collected.
+        // Calculate the average percentage difference if any valid percentages were collected.
         if (percentageDifferences.length > 0) {
           const averagePercentageDifference = percentageDifferences.reduce((acc, val) => acc + val, 0) / percentageDifferences.length;
-          // This is always a number, so calling .toFixed() here is safe
-          setPercentageDifference(averagePercentageDifference.toFixed(0));
+          // Check if the value is positive and prepend a "+" sign
+          const formattedPercentageDifference = averagePercentageDifference > 0 ? `+${averagePercentageDifference.toFixed(0)}` : averagePercentageDifference.toFixed(0);
+          setPercentageDifference(formattedPercentageDifference);
         } else {
-          // Directly set a string without attempting to call .toFixed() on it
+          // Handle cases with no data differently if necessary
           setPercentageDifference("No Data");
         }
+
+        // const timestamps = await findUserTimestampsInDAU(geohash, user); // Pass the correct user object
+        // setUserTimestamps(timestamps);
 
         
 
@@ -95,7 +114,7 @@ useEffect(() => {
   };
 
   fetchData();
-}, [geohash, refreshTable, setEnvironmentMetrics, setTrafficMetrics, setSafetyMetrics, setPublicHealthMetrics]);
+}, [geohash, refreshCounter, setEnvironmentMetrics, setTrafficMetrics, setSafetyMetrics, setPublicHealthMetrics]);
 
 
 
@@ -160,9 +179,22 @@ return (
           </div>
 
         </div>
-
-        {/* Personal section */}
+        
+        
+        {/* Personal section
+        /*
         <div className="text-gray-800 text-lg mb-2 font-bold">Personal</div>
+        <div className="pl-4">
+          <div className="text-gray-800 text-lg mb-2">
+            Alibi:
+            <ul>
+            {userTimestamps.map((timestamp, index) => (
+              <li key={index}>{timestamp}</li>
+            ))}
+          </ul>
+          </div>
+        </div>
+         */}
         
         {/* Example dynamic listing if needed for each section */}
         {items.map((item) => {
