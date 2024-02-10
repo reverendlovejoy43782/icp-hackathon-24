@@ -83,19 +83,25 @@ Geohash as Storage Key: The visitors.js module utilizes these geohashes as keys 
 
 # Using the app
 
-## App screen
+## Home / app screen
 
 There is only one screen. Users can show geo location and check in as described earlier.
 
 <img width="334" alt="image" src="https://github.com/reverendlovejoy43782/icp-hackathon-24/assets/85878768/d1ad5df9-e441-42f1-a3ba-707184dcc0a9">
 
+## Show Geo data
+
 When clicking on Show geo data, the map location and square for the clients location is show on google maps. The information in the data storage for this square is listed in the table below.
 
 <img width="334" alt="image" src="https://github.com/reverendlovejoy43782/icp-hackathon-24/assets/85878768/701bb1e6-8afa-4652-83d0-45a2a08547aa">
 
+## Check in
+
 When clicking check in user updates the data storage immediatly (when already logged in) or has to login by clicking on login.
 
 <img width="334" alt="image" src="https://github.com/reverendlovejoy43782/icp-hackathon-24/assets/85878768/c03444d0-4254-4058-9dea-ba6a6e31fc18">
+
+## Login and update table
 
 After clicking loging and authenticating with Internet Identity the data storages DauId list is updated by the hashed user id of the client (Internet Identity) only if this user did not already check in today. Then the table below is updated reflecting the updated check ins for today and difference to average (comparison of todays check ins to the average of the last 28 days - days are minutes in this test app though).
 
