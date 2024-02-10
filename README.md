@@ -25,7 +25,7 @@ The Internet Computer plays a central role in this part. It is tasked with recei
 Part 3: The Data Layer Itself
 This is the core of the architectore. It comprises the actual data layer, the world surface divided into small squares, akin to concepts like what3words. Each square can be an NFT on the Ethereum blockchain. Only NFTs for Squares are created, where there is data collected in the real world by Part 1 to minimize data and ressource usage. This data object (NFTs on Ethereum) is publicly accessible, enabling widespread analysis and use by anyone. Developers can create their own applications that leverage this data to provide valuable information to users or other participants. It is a publicly accessible data object of the world — a public good. Only the control over collecting, filtering, and writing the data is restricted to the Internet Computer maybe managed and maintained by a large DAO consisting of participants form Part 1 like the WHO, other NGOs, users or even Tesla (as maker of a large group of agents).
 
-The here presented react app is only an example of the use case where users utilize their smartphone to read data about a square and write data. See below a grafic showing the intended architecture of the whole concept and where this app fits in.
+The here presented react app is only an example of the use case where users utilize their smartphone to read data about a square and write data. See below a grafic showing the intended architecture of the whole concept and where this app fits in. It lacks the NFT datalayer and the processes on IC to interact with it. The data object is simulated by a data object on the juno datastore.
 
 Google Slides Link: https://docs.google.com/presentation/d/1CCmkzTppb2zL5DdSr9sPjyvRwRBZbsBAA7WuKWVYa3s/edit?usp=sharing
 
@@ -48,6 +48,7 @@ Public Health: Displays simulated data on metrics like the Incidence Rate of Pan
 Safety and Traffic: Provides a glimpse into safety and traffic scenarios with simulated Crime Rates and Traffic Accident Probabilities.
 Society: This section, enriched by real user interactions, shows the number of users who have checked in at the location today, alongside a comparison to the baseline average of the last 28 days, offering a real-time snapshot of community engagement.
 When users "check in," App.js coordinates a secure data capture and analysis process. Authentication through Auth.js and user privacy via CryptoJS hashing are paramount. The visitors.js module updates the DAU count for the geohash, supported by handleWriteFunctions.js for data operations on the decentralized layer. This not only allows users to see how many others have shared their presence but also contextualizes this activity against historical averages, analyzed and displayed by visitors.js.
+
 
 
 
