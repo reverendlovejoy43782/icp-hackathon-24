@@ -29,7 +29,7 @@ This is the core of the architecture. It comprises the actual data layer, the wo
 
 
 ## Restrictions of this app compared to the whole concept
-The here presented react app is only an example of the use case where users utilize their smartphone to read data about a square and write data. See below a grafic showing the intended architecture of the whole concept and where this app fits in. It lacks the NFT datalayer and the processes on IC to interact with it. The data object is simulated by a data object on the juno datastore. Future versions will utilize the IC capability to interact with Ethereum to create NFTs and append data to them.
+The here presented react app is only an example of the use case where users utilize their smartphone to read data about a square and write data. See below a grafic showing the intended architecture of the whole concept and where this app fits in. It lacks the NFT datalayer and the processes on IC to interact with it. The data object is simulated by a data object on the juno datastore. Future versions will utilize the IC capability to interact with Ethereum to create NFTs and append data to them. Lots of data science should be employed to first find the optimal data structure and filtering mechanisms to enhance sustainability and performance of the concept.
 
 Google Slides Link: https://docs.google.com/presentation/d/1CCmkzTppb2zL5DdSr9sPjyvRwRBZbsBAA7WuKWVYa3s/edit?usp=sharing
 
