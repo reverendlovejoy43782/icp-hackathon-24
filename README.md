@@ -66,8 +66,14 @@ Geolocation Acquisition: Initially, useGeolocation.js fetches the user's geoloca
 
 Grid Area Calculation: areaGenerator.js then calculates a grid area based on these coordinates, defining a broader area for detailed breakdown.
 
-Squares and Geohash Generation: Subsequently, gridGenerator.js divides the grid into smaller squares, assigning a unique geohash to each. This process translates geographic locations into short alphanumeric identifiers, optimizing spatial data representation and storage.
+Squares and Geohash Generation: Subsequently, gridGenerator.js divides the grid into smaller squares of 500 x 500 metres, assigning a unique geohash to each. This process translates geographic locations into short alphanumeric identifiers, optimizing spatial data representation and storage.
 
 Geohash as Storage Key: The visitors.js module utilizes these geohashes as keys for storing and retrieving location-specific data within a decentralized storage system, ensuring accurate geographical categorization.
 
 
+# Using the code
+
+- Clone the repo
+- Create .env file in root folder
+- Log in to Google Cloud Console and generate an API Key for Google Maps
+- Add REACT_APP_GOOGLE_MAPS_API_KEY=MAPS_API_KEY with your respective API-Key to the .env file
