@@ -45,6 +45,8 @@ The React app was developed using the code and platform provided by Juno.
 
 ## User flow and app process
 
+Demo video of app: https://www.loom.com/share/55b9ee38af184766bb2a00097a25cc35?sid=fe78208c-bae6-4d9a-bb10-42eab3eb7293 
+
 User loads the react web app being in a location of interest. User can now 
 - click "Show Geo data" to show information about this location or more specifically about the Square (500 x 500 metres) user is in.
 - click "Check in" to log user id (hashed) in the data object for this day and square to attest being here. This can be used at e.g. rallies to proof a crowd.
