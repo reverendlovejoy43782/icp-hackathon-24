@@ -60,15 +60,15 @@ When selecting "Show Geo Data," App.js activates useGeolocation.js to fetch the 
 - Society: This section, enriched by real user interactions, shows the number of users who have checked in at the location today, alongside a comparison to the baseline average of the last 28 days, offering a real-time snapshot of community engagement. For testing purposes the "days" are minutes in the app to simluate better by using the app. There would be more use cases possible like "Alibi indicator" where user would have to authenticate using biometric information like Face ID to log in using the Internet Identitiy and log the hashed user id for a specific square and timestamp. Later one could read this as an indicator that a specific device and a specific person (tied together by biometric auth) where at a certain place at a certain time (this is not implement in the app right now). 
 
 ### "Check in"
-When users click "Check in," App.js coordinates login via Auth.js (another click on "Login"), when not yet logged in. When logged in it triggers visitors.js module to update the DAU (daily active user, distinct count of hashed user id) count for this geohash, supported by handleWriteFunctions.js. Upon write succes to the datastore it refreshes the table.
+When users click "Check in," App.js coordinates login via Auth.js by showing login.js where user sees Login buton and needs to login with Internet Identidy. When already being logged in or after login it it triggers visitors.js module to update the DAU (daily active user, distinct count of hashed user id) count for this geohash, supported by handleWriteFunctions.js. Upon write success to the datastore it refreshes the table.
 
 ## Creating the geohash square
 
 Geolocation Acquisition: Initially, useGeolocation.js fetches the user's geolocation using the browser's navigator.geolocation API, obtaining latitude and longitude.
 
-Grid Area Calculation: areaGenerator.js then calculates a grid area based on these coordinates, defining a broader area for detailed breakdown.
+Grid Area Calculation: areaGenerator.js then calculates a grid area based on these coordinates, defining a broader area for detailed breakdown referencing the longitudinal and latitudinal lines of the global therefore fixing the area and therefore the geohash squares.
 
-Squares and Geohash Generation: Subsequently, gridGenerator.js divides the grid into smaller squares of 500 x 500 metres, assigning a unique geohash to each. This process translates geographic locations into short alphanumeric identifiers, optimizing spatial data representation and storage.
+Squares and Geohash Generation: Subsequently, gridGenerator.js divides the broader area into smaller squares of 500 x 500 metres, assigning a unique geohash to each. This process translates geographic squares where the clients are into short alphanumeric identifiers, optimizing spatial data representation and storage. More specifically it makes it possible to tie a clients geolocation to keys and values on the data storage.
 
 Geohash as Storage Key: The visitors.js module utilizes these geohashes as keys for storing and retrieving location-specific data within a decentralized storage system, ensuring accurate geographical categorization.
 
@@ -79,3 +79,15 @@ Geohash as Storage Key: The visitors.js module utilizes these geohashes as keys 
 - Create .env file in root folder
 - Log in to Google Cloud Console and generate an API Key for Google Maps
 - Add REACT_APP_GOOGLE_MAPS_API_KEY=MAPS_API_KEY with your respective API-Key to the .env file
+
+
+# Running the app
+
+## App screen
+
+There is only one screen. There user can Show geo location and Check in as described earlier.
+
+<img width="334" alt="image" src="https://github.com/reverendlovejoy43782/icp-hackathon-24/assets/85878768/d1ad5df9-e441-42f1-a3ba-707184dcc0a9">
+
+
+
