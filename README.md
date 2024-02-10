@@ -45,9 +45,9 @@ The React app was developed using the code and platform provided by Juno.
 
 ## User flow and app process
 
-User load the react web app being in a location of interest. The can now 
-- click "Show Geo data" to show information about this location or more specifically about the Square (500 x 500 metres) he is in.
-- click "Check in" to log his user id (hashed) in the data object for this day and square to attest being here. This can be used at e.g. rallies to proof a crowd.
+User loads the react web app being in a location of interest. User can now 
+- click "Show Geo data" to show information about this location or more specifically about the Square (500 x 500 metres) user is in.
+- click "Check in" to log user id (hashed) in the data object for this day and square to attest being here. This can be used at e.g. rallies to proof a crowd.
 
 ### "Show Geo data"
 When selecting "Show Geo Data," App.js activates useGeolocation.js to fetch the user's location, and showGeolocation.js for map visualization on Google Maps. Simultaneously, showTable.js reveals a variety of metrics across several sections, illustrating examples of data that can populate the decentralized data layer:
