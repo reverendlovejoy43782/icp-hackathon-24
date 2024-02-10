@@ -105,7 +105,8 @@ When clicking check in user updates the data storage immediatly (when already lo
 
 After clicking loging and authenticating with Internet Identity the data storages DauId list is updated by the hashed user id of the client (Internet Identity) only if this user did not already check in today. Then the table below is updated reflecting the updated check ins for today and difference to average (comparison of todays check ins to the average of the last 28 days - days are minutes in this test app though).
 
-<img width="334" alt="image" src="https://github.com/reverendlovejoy43782/icp-hackathon-24/assets/85878768/6243cf10-fe0b-4b10-867c-2740247d7bba">
+<img width="334" alt="image" src="https://github.com/reverendlovejoy43782/icp-hackathon-24/assets/85878768/0b4b7a94-d84e-4142-975e-35ebebb5ef75">
+
 
 
 
