@@ -131,7 +131,7 @@ function App() {
       setShowTable(true);
       setDataDisplayed(true); // Set to true when fetching location
       // Increment the counter to trigger a refresh
-      //setRefreshCounter(prevCounter => prevCounter + 1);
+      setRefreshCounter(prevCounter => prevCounter + 1);
     } else {
       setShowMap(!showMap);
     }
