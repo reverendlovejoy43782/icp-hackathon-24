@@ -10,6 +10,7 @@ This project proposes an architecture where the Internet Computer plays a centra
 
 The World's Data Layer, as envisioned in this project, presents a framework for collecting, analyzing, and disseminating geospatial data. This is broadly segmented into three main components:
 
+
 1. Part: Reading and Writing
 
 This segment facilitates direct interaction between the world and the data layer. 
@@ -23,6 +24,10 @@ The Internet Computer plays a central role in this part. It is tasked with recei
 
 Part 3: The Data Layer Itself
 This is the core of the architectore. It comprises the actual data layer, the world surface divided into small squares, akin to concepts like what3words. Each square can be an NFT on the Ethereum blockchain. Only NFTs for Squares are created, where there is data collected in the real world by Part 1 to minimize data and ressource usage. This data object (NFTs on Ethereum) is publicly accessible, enabling widespread analysis and use by anyone. Developers can create their own applications that leverage this data to provide valuable information to users or other participants. It is a publicly accessible data object of the world — a public good. Only the control over collecting, filtering, and writing the data is restricted to the Internet Computer maybe managed and maintained by a large DAO consisting of participants form Part 1 like the WHO, other NGOs, users or even Tesla (as maker of a large group of agents).
+
+The here presented react app is only an example of the use case where users utilize their smartphone to read data about a square and write data. See below a grafic showing the intended architecture of the whole concept and where this app fits in.
+
+Google Slides Link: https://docs.google.com/presentation/d/1CCmkzTppb2zL5DdSr9sPjyvRwRBZbsBAA7WuKWVYa3s/edit?usp=sharing
 
 
 # React app functionality overview
