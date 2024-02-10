@@ -41,7 +41,7 @@ The React app was developed using the code and platform provided by Juno.
 ## Underlying repo and platform
 - React code used from Juno: https://github.com/junobuild/workshops/tree/main/react
 - Juno Platform: https://juno.build
-(!) A thank you to David and the Internet Computer (IC) team for this easy to use and convenient platform. It helped being able to do this in the short time frame.
+(!) A thank you to David and the Internet Computer (IC) team for this easy to use and convenient platform. Only this enabled me to develop the app prototype in the couple of hours that i had.
 
 ## User flow and app process
 
