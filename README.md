@@ -58,7 +58,7 @@ When selecting "Show Geo Data," App.js activates useGeolocation.js to fetch the 
 - Society: This section, enriched by real user interactions, shows the number of users who have checked in at the location today, alongside a comparison to the baseline average of the last 28 days, offering a real-time snapshot of community engagement. For testing purposes the "days" are minutes in the app to simluate better by using the app. There would be more use cases possible like "Alibi indicator" where user would have to authenticate using biometric information like Face ID to log in using the Internet Identitiy and log the hashed user id for a specific square and timestamp. Later one could read this as an indicator that a specific device and a specific person (tied together by biometric auth) where at a certain place at a certain time (this is not implement in the app right now). 
 
 ### "Check in"
-When users click "Check in," App.js coordinates login via Auth.js (another click on "Login"), when not yet logged in. When logged in it triggers visitors.js module to update the DAU (daily active user, distinct count of hashed user id) count for this geohash, supported by handleWriteFunctions.js.Upon write succes it refreshes the table.
+When users click "Check in," App.js coordinates login via Auth.js (another click on "Login"), when not yet logged in. When logged in it triggers visitors.js module to update the DAU (daily active user, distinct count of hashed user id) count for this geohash, supported by handleWriteFunctions.js. Upon write succes to the datastore it refreshes the table.
 
 ## Creating the geohash square
 
@@ -71,21 +71,3 @@ Squares and Geohash Generation: Subsequently, gridGenerator.js divides the grid 
 Geohash as Storage Key: The visitors.js module utilizes these geohashes as keys for storing and retrieving location-specific data within a decentralized storage system, ensuring accurate geographical categorization.
 
 
-
-
-
-## Getting started
-
-Make sure you have [node.js](https://nodejs.org) LTS installed.
-
-```bash
-git clone https://github.com/junobuild/examples
-cd react/diary
-npm ci
-```
-
-## Local development
-
-```
-npm run start
-```
