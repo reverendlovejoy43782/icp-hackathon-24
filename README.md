@@ -8,7 +8,7 @@ This project proposes an architecture where the Internet Computer plays a centra
 
 # Architecture and how react app fits in
 
-The World's Data Layer, as envisioned in this project, presents a framework for collecting, analyzing, and disseminating geospatial data. This data layer is broadly segmented into three main components:
+The World's Data Layer, as envisioned in this project, presents a framework for collecting, analyzing, and disseminating geospatial data. This is broadly segmented into three main components:
 
 1. Part: Reading and Writing
 
